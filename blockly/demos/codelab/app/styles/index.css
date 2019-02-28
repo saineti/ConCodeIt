@@ -1,5 +1,5 @@
 main {
-  width: 400px;
+ /*  width: 800px; */
   position: relative;
   margin: 0 auto;
   overflow:hidden;
@@ -23,7 +23,7 @@ h1 {
 .mode-edit,
 .mode-maker,
 .mode-blockly {
-  display: none;
+  display: block;
 }
 
 [mode="maker"] .mode-maker,
@@ -35,7 +35,7 @@ h1 {
 .blockly-editor {
   position: absolute;
   top: 64px;
-  left: -400px;
+  left: 500px;
   transition: left .4s;
   height: 460px;
   width: 400px;
@@ -43,7 +43,7 @@ h1 {
 }
 
 [mode="blockly"] .blockly-editor {
-  left: 0;
+  /* left: 0; */
 }
 
 .maker {
@@ -52,6 +52,7 @@ h1 {
   justify-content: space-between;
   height: 460px;
   width: 400px;
+  margin: 40px;
 }
 
 .maker > div {
