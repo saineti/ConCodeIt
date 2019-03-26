@@ -1,3 +1,3 @@
-[submodule "blockly-games"]
-	path = blockly-games
-	url = git@github.com:saineti/blockly-games.git
+[submodule "con_blockly-games"]
+	path = con_blockly-games
+	url = git@github.com:saineti/con_blockly-games.git
