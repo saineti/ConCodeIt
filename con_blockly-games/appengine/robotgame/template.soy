@@ -1,11 +1,10 @@
-{namespace Robotmaze.soy}
+{namespace Maze.soy}
 
 /**
- * This is modified by Wendy and Harshita March 27th
- *This is a Closure Template.
+ * This is a Closure Template.
  *
  * To regenerate just English, run:
- *   make robotmaze-en
+ *   make robotgame-en
  *
  * To regenerate all languages, run:
  *   make languages
@@ -18,8 +17,9 @@
   {call BlocklyGames.soy.messages /}
   <div style="display: none">
     <span id="Maze_moveForward">{msg meaning="Maze.moveForward" desc="block text - Imperative or infinitive of a verb for a person moving (walking) in the direction he/she is facing."}move forward{/msg}</span>
-    <span id="Maze_turnLeft">{msg meaning="Maze.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation counter-clockwise.  Prefer a translation that has text in common with the translation of 'turn right'.  See [[Translating:Blockly#Drop-Down_Menus]]."}turn left{/msg}</span>
-    <span id="Maze_turnRight">{msg meaning="Maze.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation clockwise.  Prefer a translation that has text in common with the translation of 'turn left'.  See [[Translating:Blockly#Drop-Down_Menus]]."}turn right{/msg}</span>
+    <span id="Maze_goForward">{msg meaning="Maze.goForward" desc="block text - Imperative or infinitive of a verb for a person moving (walking) in the direction he/she is facing."}go forward{/msg}</span>
+    <span id="Maze_turnLeft">{msg meaning="Maze.turnLeft" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation counter-clockwise.  Prefer a translation that has text in common with the translation of 'turn right'.  See [[Translating:Blockly#Drop-Down_Menus]]."}left{/msg}</span>
+    <span id="Maze_turnRight">{msg meaning="Maze.turnRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Imperative or infinitive of a verb for a person turning his head and body one quarter rotation clockwise.  Prefer a translation that has text in common with the translation of 'turn left'.  See [[Translating:Blockly#Drop-Down_Menus]]."}right{/msg}</span>
     <span id="Maze_doCode">{{msg meaning="Maze.doCode" desc="block text - Imperative or infinitive of a verb preceding one or more commands to a person.  This is part of [https://github.com/google/blockly/wiki/Loops#repeat repeat] and [https://github.com/google/blockly/wiki/IfElse#If_blocks if] blocks.\n{lb}{lb}Identical|Do{rb}{rb}"}}do{{/msg}}</span>
     <span id="Maze_elseCode">{{msg meaning="Maze.elseCode" desc="block text - Conjunction meaning 'otherwise', introducing commands to be performed if a previous condition was not true, as in 'if x>3, do this, else do that'.  See [https://github.com/google/blockly/wiki/IfElse#If-Else_blocks].\n{lb}{lb}Identical|Else{rb}{rb}"}}else{{/msg}}</span>
     // The helpIfElse definition was copied up here ahead of when it is needed
@@ -30,6 +30,7 @@
     <span id="Maze_pathRight">{msg meaning="Maze.pathRight" desc="[[Translating:Blockly#Drop-Down_Menus dropdown]] - Condensed form of 'if there is a path to the right', as in: 'if path to the right, turn right'."}if path to the right{/msg}</span>
     <span id="Maze_repeatUntil">{msg meaning="Maze.repeatUntil" desc="block text - Imperative or infinitive of a verb to repeat the following commands.  The phrase is followed by the symbol denoting the end of the maze."}repeat until{/msg}</span>
     <span id="Maze_moveForwardTooltip">{msg meaning="Maze.moveForwardTooltip" desc="tooltip - Moves the icon on the screen representing the player forward one square on the maze board."}Moves the player forward one space.{/msg}</span>
+    <span id="Maze_goForwardTooltip">{msg meaning="Maze.goForwardTooltip" desc="tooltip - Moves the icon on the screen representing the player forward two squares on the maze board."}Moves the player forward two spaces.{/msg}</span>
     <span id="Maze_turnTooltip">{msg meaning="Maze.turnTooltip" desc="tooltip - Turns the icon on the screen representing the player 90 degrees counter-clockwise (left) or clockwise (right)."}Turns the player left or right by 90 degrees.{/msg}</span>
     <span id="Maze_ifTooltip">{msg meaning="Maze.ifTooltip" desc="tooltip - 'path' refers to a path through a maze."}If there is a path in the specified direction, then do some actions.{/msg}</span>
     <span id="Maze_ifelseTooltip">{msg meaning="Maze.ifelseTooltip" desc="tooltip - 'path' refers to a path through a maze."}If there is a path in the specified direction, then do the first block of actions. Otherwise, do the second block of actions.{/msg}</span>
@@ -51,24 +52,16 @@
         <h1>
           {call BlocklyGames.soy.titleSpan}
             {param appName}
-              {msg meaning="Games.maze" desc="IBID"}maze{/msg}
+              {msg meaning="Games.maze" desc="IBID"}Help out our robot waiter!{/msg}
             {/param}
-          {/call}
-          {call BlocklyGames.soy.levelLinks}
-            {param level: $ij.level /}
-            {param maxLevel: $ij.maxLevel /}
-            {param lang: $ij.lang /}
-            {param suffix}&skin={$ij.skin}{/param}
           {/call}
         </h1>
       </td>
       <td class="farSide">
-        <select id="languageMenu"></select>
-        &nbsp;
-        <button id="linkButton" title="{msg meaning="Games.linkTooltip" desc="IBID"}Save and link to blocks.{/msg}">
+        /*<button id="linkButton" title="{msg meaning="Games.linkTooltip" desc="IBID"}Save and link to blocks.{/msg}">
           <img src="common/1x1.gif" class="link icon21">
         </button>
-        &nbsp;
+        &nbsp;*/
         <button id="pegmanButton">
           <img src="common/1x1.gif">
           <span id="pegmanButtonArrow"></span>
@@ -241,7 +234,35 @@
 {template .toolbox}
   <xml id="toolbox" style="display: none;">
     <block type="maze_moveForward"></block>
+    <block type="maze_goForward"></block>
+    <block type="maze_displayQuestion">
+      /*<value name="QUESTION">
+        <block type="text">
+          <field name="TEXT">Yes or no?</field>
+        </block>
+      </value>*/
+      /*<value name="CHOICES">
+        <block type="lists_create_with">
+          <mutation items="2"></mutation>
+          <value name="ADD0">
+            <block type="text">
+              <field name="TEXT">Yes</field>
+            </block>
+          </value>
+          <value name="ADD1">
+            <block type="text">
+              <field name="TEXT">No</field>
+            </block>
+          </value>
+        </block>
+      </value>*/
+    </block>
+    <block type="maze_waitForAnyOf"></block>
+    <block type="maze_waitForAll"></block>
+    <block type="maze_waitForSpecificOne"></block>
+    <block type="maze_detectLocation"><field name="LOCATION">Table 1</field></block>
     <block type="maze_turn"><field name="DIR">turnLeft</field></block>
+    <block type="maze_senseAndTurn"><field name="DIR">turnLeft</field></block>
     <block type="maze_turn"><field name="DIR">turnRight</field></block>
     {if $ij.level > 2}
       <block type="maze_forever"></block>

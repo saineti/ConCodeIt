@@ -522,7 +522,7 @@ Maze.init = function() {
   BlocklyGames.workspace.getAudioManager().load(Maze.SKIN.crashSound, 'fail');
   // Not really needed, there are no user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
-      'turnRight,turnLeft,isPathForward,isPathRight,isPathBackward,isPathLeft');
+      'goForward,displayQuestion,detectLocation,senseAndTurn,waitForAnyOf,waitForSpecificOne,waitForAll,turnRight,turnLeft,isPathForward,isPathRight,isPathBackward,isPathLeft');
 
   Maze.drawMap();
 
@@ -991,6 +991,11 @@ Maze.initInterpreter = function(interpreter, scope) {
   interpreter.setProperty(scope, 'moveForward',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
+    Maze.move(0, id);
+  };
+  interpreter.setProperty(scope, 'goForward',
+      interpreter.createNativeFunction(wrapper));
+  wrapper = function(id) {
     Maze.move(2, id);
   };
   interpreter.setProperty(scope, 'moveBackward',
@@ -1108,22 +1113,22 @@ Maze.animate = function() {
     case 'north':
       Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
                     [Maze.pegmanX, Maze.pegmanY - 1, Maze.pegmanD * 4]);
-      Maze.pegmanY--;
+      Maze.pegmanY -= 2;
       break;
     case 'east':
       Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
                     [Maze.pegmanX + 1, Maze.pegmanY, Maze.pegmanD * 4]);
-      Maze.pegmanX++;
+      Maze.pegmanX += 2;
       break;
     case 'south':
       Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
                     [Maze.pegmanX, Maze.pegmanY + 1, Maze.pegmanD * 4]);
-      Maze.pegmanY++;
+      Maze.pegmanY += 2;
       break;
     case 'west':
       Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
                     [Maze.pegmanX - 1, Maze.pegmanY, Maze.pegmanD * 4]);
-      Maze.pegmanX--;
+      Maze.pegmanX -= 2;
       break;
     case 'look_north':
       Maze.scheduleLook(Maze.DirectionType.NORTH);
@@ -1452,19 +1457,19 @@ Maze.move = function(direction, id) {
   var command;
   switch (Maze.constrainDirection4(effectiveDirection)) {
     case Maze.DirectionType.NORTH:
-      Maze.pegmanY--;
+      Maze.pegmanY -= 2;
       command = 'north';
       break;
     case Maze.DirectionType.EAST:
-      Maze.pegmanX++;
+      Maze.pegmanX += 2;
       command = 'east';
       break;
     case Maze.DirectionType.SOUTH:
-      Maze.pegmanY++;
+      Maze.pegmanY += 2;
       command = 'south';
       break;
     case Maze.DirectionType.WEST:
-      Maze.pegmanX--;
+      Maze.pegmanX -= 2;
       command = 'west';
       break;
   }
