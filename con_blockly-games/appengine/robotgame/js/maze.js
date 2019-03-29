@@ -1,5 +1,5 @@
 /**
- * Blockly Games: Robotmaze
+ * Blockly Games: Maze
  *
  * Copyright 2012 Google Inc.
  * https://github.com/google/blockly-games
@@ -18,21 +18,21 @@
  */
 
 /**
- * @fileoverview JavaScript for Blockly's Robotmaze application.
+ * @fileoverview JavaScript for Blockly's Maze application.
  * @author fraser@google.com (Neil Fraser)
  */
 'use strict';
 
-goog.provide('Robotmaze');
+goog.provide('Robotgame');
 
 goog.require('Blockly.FieldDropdown');
 goog.require('BlocklyDialogs');
 goog.require('BlocklyGames');
 goog.require('BlocklyInterface');
 goog.require('Maze.Blocks');
-goog.require('Robotmaze.soy');
+goog.require('Maze.soy');
 
-BlocklyGames.NAME = 'robotmaze';
+BlocklyGames.NAME = 'maze';
 
 /**
  * Go to the next level.  Add skin parameter.
@@ -43,21 +43,21 @@ BlocklyInterface.nextLevel = function() {
     window.location = window.location.protocol + '//' +
         window.location.host + window.location.pathname +
         '?lang=' + BlocklyGames.LANG + '&level=' + (BlocklyGames.LEVEL + 1) +
-        '&skin=' + Robotmaze.SKIN_ID;
+        '&skin=' + Maze.SKIN_ID;
   } else {
     BlocklyInterface.indexPage();
   }
 };
 
-Robotmaze.MAX_BLOCKS = [undefined, // Level 0.
+Maze.MAX_BLOCKS = [undefined, // Level 0.
     Infinity, Infinity, 2, 5, 5, 5, 5, 10, 7, 10][BlocklyGames.LEVEL];
 
 // Crash type constants.
-Robotmaze.CRASH_STOP = 1;
-Robotmaze.CRASH_SPIN = 2;
-Robotmaze.CRASH_FALL = 3;
+Maze.CRASH_STOP = 1;
+Maze.CRASH_SPIN = 2;
+Maze.CRASH_FALL = 3;
 
-Robotmaze.SKINS = [
+Maze.SKINS = [
   // sprite: A 1029x51 set of 21 avatar images.
   // tiles: A 250x200 set of 20 map images.
   // marker: A 20x34 goal image.
@@ -68,64 +68,64 @@ Robotmaze.SKINS = [
   // crashSound: List of sounds (in various formats) for player crashes.
   // crashType: Behaviour when player crashes (stop, spin, or fall).
   {
-    sprite: 'robotmaze/pegman.png',
-    tiles: 'robotmaze/tiles_pegman.png',
-    marker: 'robotmaze/marker.png',
+    sprite: 'maze/pegman.png',
+    tiles: 'maze/tiles_pegman.png',
+    marker: 'maze/marker.png',
     background: false,
     graph: false,
     look: '#000',
-    winSound: ['robotmaze/win.mp3', 'robotmaze/win.ogg'],
-    crashSound: ['robotmaze/fail_pegman.mp3', 'robotmaze/fail_pegman.ogg'],
-    crashType: Robotmaze.CRASH_STOP
+    winSound: ['maze/win.mp3', 'maze/win.ogg'],
+    crashSound: ['maze/fail_pegman.mp3', 'maze/fail_pegman.ogg'],
+    crashType: Maze.CRASH_STOP
   },
   {
-    sprite: 'robotmaze/astro.png',
-    tiles: 'robotmaze/tiles_astro.png',
-    marker: 'robotmaze/marker.png',
-    background: 'robotmaze/bg_astro.jpg',
+    sprite: 'maze/astro.png',
+    tiles: 'maze/tiles_astro.png',
+    marker: 'maze/marker.png',
+    background: 'maze/bg_astro.jpg',
     // Coma star cluster, photo by George Hatfield, used with permission.
     graph: false,
     look: '#fff',
-    winSound: ['robotmaze/win.mp3', 'robotmaze/win.ogg'],
-    crashSound: ['robotmaze/fail_astro.mp3', 'robotmaze/fail_astro.ogg'],
-    crashType: Robotmaze.CRASH_SPIN
+    winSound: ['maze/win.mp3', 'maze/win.ogg'],
+    crashSound: ['maze/fail_astro.mp3', 'maze/fail_astro.ogg'],
+    crashType: Maze.CRASH_SPIN
   },
   {
-    sprite: 'robotmaze/panda.png',
-    tiles: 'robotmaze/tiles_panda.png',
-    marker: 'robotmaze/marker.png',
-    background: 'robotmaze/bg_panda.jpg',
+    sprite: 'maze/panda.png',
+    tiles: 'maze/tiles_panda.png',
+    marker: 'maze/marker.png',
+    background: 'maze/bg_panda.jpg',
     // Spring canopy, photo by Rupert Fleetingly, CC licensed for reuse.
     graph: false,
     look: '#000',
-    winSound: ['robotmaze/win.mp3', 'robotmaze/win.ogg'],
-    crashSound: ['robotmaze/fail_panda.mp3', 'robotmaze/fail_panda.ogg'],
-    crashType: Robotmaze.CRASH_FALL
+    winSound: ['maze/win.mp3', 'maze/win.ogg'],
+    crashSound: ['maze/fail_panda.mp3', 'maze/fail_panda.ogg'],
+    crashType: Maze.CRASH_FALL
   }
 ];
-Robotmaze.SKIN_ID = BlocklyGames.getNumberParamFromUrl('skin', 0, Robotmaze.SKINS.length);
-Robotmaze.SKIN = Robotmaze.SKINS[Robotmaze.SKIN_ID];
+Maze.SKIN_ID = BlocklyGames.getNumberParamFromUrl('skin', 0, Maze.SKINS.length);
+Maze.SKIN = Maze.SKINS[Maze.SKIN_ID];
 
 /**
  * Milliseconds between each animation frame.
  */
-Robotmaze.stepSpeed;
+Maze.stepSpeed;
 
 /**
- * The types of squares in the robotmaze, which is represented
+ * The types of squares in the maze, which is represented
  * as a 2D array of SquareType values.
  * @enum {number}
  */
-Robotmaze.SquareType = {
+Maze.SquareType = {
   WALL: 0,
   OPEN: 1,
   START: 2,
   FINISH: 3
 };
 
-// The robotmaze square constants defined above are inlined here
-// for ease of reading and writing the static robotmazes.
-Robotmaze.map = [
+// The maze square constants defined above are inlined here
+// for ease of reading and writing the static mazes.
+Maze.map = [
 // Level 0.
  undefined,
 // Level 1.
@@ -157,9 +157,9 @@ Robotmaze.map = [
 // Level 4.
 /**
  * Note, the path continues past the start and the goal in both directions.
- * This is intentionally done so users see the robotmaze is about getting from
+ * This is intentionally done so users see the maze is about getting from
  * the start to the goal and not necessarily about moving over every part of
- * the robotmaze, 'mowing the lawn' as Neil calls it.
+ * the maze, 'mowing the lawn' as Neil calls it.
  */
  [[0, 0, 0, 0, 0, 0, 0, 1],
   [0, 0, 0, 0, 0, 0, 1, 1],
@@ -226,27 +226,27 @@ Robotmaze.map = [
 ][BlocklyGames.LEVEL];
 
 /**
- * Measure robotmaze dimensions and set sizes.
+ * Measure maze dimensions and set sizes.
  * ROWS: Number of tiles down.
  * COLS: Number of tiles across.
- * SQUARE_SIZE: Pixel height and width of each robotmaze square (i.e. tile).
+ * SQUARE_SIZE: Pixel height and width of each maze square (i.e. tile).
  */
-Robotmaze.ROWS = Robotmaze.map.length;
-Robotmaze.COLS = Robotmaze.map[0].length;
-Robotmaze.SQUARE_SIZE = 50;
-Robotmaze.PEGMAN_HEIGHT = 52;
-Robotmaze.PEGMAN_WIDTH = 49;
+Maze.ROWS = Maze.map.length;
+Maze.COLS = Maze.map[0].length;
+Maze.SQUARE_SIZE = 50;
+Maze.PEGMAN_HEIGHT = 52;
+Maze.PEGMAN_WIDTH = 49;
 
-Robotmaze.MAZE_WIDTH = Robotmaze.SQUARE_SIZE * Robotmaze.COLS;
-Robotmaze.MAZE_HEIGHT = Robotmaze.SQUARE_SIZE * Robotmaze.ROWS;
-Robotmaze.PATH_WIDTH = Robotmaze.SQUARE_SIZE / 3;
+Maze.MAZE_WIDTH = Maze.SQUARE_SIZE * Maze.COLS;
+Maze.MAZE_HEIGHT = Maze.SQUARE_SIZE * Maze.ROWS;
+Maze.PATH_WIDTH = Maze.SQUARE_SIZE / 3;
 
 /**
  * Constants for cardinal directions.  Subsequent code assumes these are
  * in the range 0..3 and that opposites have an absolute difference of 2.
  * @enum {number}
  */
-Robotmaze.DirectionType = {
+Maze.DirectionType = {
   NORTH: 0,
   EAST: 1,
   SOUTH: 2,
@@ -256,7 +256,7 @@ Robotmaze.DirectionType = {
 /**
  * Outcomes of running the user program.
  */
-Robotmaze.ResultType = {
+Maze.ResultType = {
   UNSET: 0,
   SUCCESS: 1,
   FAILURE: -1,
@@ -267,22 +267,22 @@ Robotmaze.ResultType = {
 /**
  * Result of last execution.
  */
-Robotmaze.result = Robotmaze.ResultType.UNSET;
+Maze.result = Maze.ResultType.UNSET;
 
 /**
  * Starting direction.
  */
-Robotmaze.startDirection = Robotmaze.DirectionType.EAST;
+Maze.startDirection = Maze.DirectionType.EAST;
 
 /**
  * PIDs of animation tasks currently executing.
  */
-Robotmaze.pidList = [];
+Maze.pidList = [];
 
 // Map each possible shape to a sprite.
 // Input: Binary string representing Centre/North/West/South/East squares.
 // Output: [x, y] coordinates of each tile's sprite in tiles.png.
-Robotmaze.tile_SHAPES = {
+Maze.tile_SHAPES = {
   '10010': [4, 0],  // Dead ends
   '10001': [3, 3],
   '11000': [0, 1],
@@ -308,72 +308,72 @@ Robotmaze.tile_SHAPES = {
 /**
  * Create and layout all the nodes for the path, scenery, Pegman, and goal.
  */
-Robotmaze.drawMap = function() {
-  var svg = document.getElementById('svgRobotmaze');
-  var scale = Math.max(Robotmaze.ROWS, Robotmaze.COLS) * Robotmaze.SQUARE_SIZE;
+Maze.drawMap = function() {
+  var svg = document.getElementById('svgMaze');
+  var scale = Math.max(Maze.ROWS, Maze.COLS) * Maze.SQUARE_SIZE;
   svg.setAttribute('viewBox', '0 0 ' + scale + ' ' + scale);
 
   // Draw the outer square.
   var square = document.createElementNS(Blockly.SVG_NS, 'rect');
-  square.setAttribute('width', Robotmaze.MAZE_WIDTH);
-  square.setAttribute('height', Robotmaze.MAZE_HEIGHT);
+  square.setAttribute('width', Maze.MAZE_WIDTH);
+  square.setAttribute('height', Maze.MAZE_HEIGHT);
   square.setAttribute('fill', '#F1EEE7');
   square.setAttribute('stroke-width', 1);
   square.setAttribute('stroke', '#CCB');
   svg.appendChild(square);
 
-  if (Robotmaze.SKIN.background) {
+  if (Maze.SKIN.background) {
     var tile = document.createElementNS(Blockly.SVG_NS, 'image');
     tile.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
-        Robotmaze.SKIN.background);
-    tile.setAttribute('height', Robotmaze.MAZE_HEIGHT);
-    tile.setAttribute('width', Robotmaze.MAZE_WIDTH);
+        Maze.SKIN.background);
+    tile.setAttribute('height', Maze.MAZE_HEIGHT);
+    tile.setAttribute('width', Maze.MAZE_WIDTH);
     tile.setAttribute('x', 0);
     tile.setAttribute('y', 0);
     svg.appendChild(tile);
   }
 
-  if (Robotmaze.SKIN.graph) {
+  if (Maze.SKIN.graph) {
     // Draw the grid lines.
     // The grid lines are offset so that the lines pass through the centre of
     // each square.  A half-pixel offset is also added to as standard SVG
     // practice to avoid blurriness.
-    var offset = Robotmaze.SQUARE_SIZE / 2 + 0.5;
-    for (var k = 0; k < Robotmaze.ROWS; k++) {
+    var offset = Maze.SQUARE_SIZE / 2 + 0.5;
+    for (var k = 0; k < Maze.ROWS; k++) {
       var h_line = document.createElementNS(Blockly.SVG_NS, 'line');
-      h_line.setAttribute('y1', k * Robotmaze.SQUARE_SIZE + offset);
-      h_line.setAttribute('x2', Robotmaze.MAZE_WIDTH);
-      h_line.setAttribute('y2', k * Robotmaze.SQUARE_SIZE + offset);
-      h_line.setAttribute('stroke', Robotmaze.SKIN.graph);
+      h_line.setAttribute('y1', k * Maze.SQUARE_SIZE + offset);
+      h_line.setAttribute('x2', Maze.MAZE_WIDTH);
+      h_line.setAttribute('y2', k * Maze.SQUARE_SIZE + offset);
+      h_line.setAttribute('stroke', Maze.SKIN.graph);
       h_line.setAttribute('stroke-width', 1);
       svg.appendChild(h_line);
     }
-    for (var k = 0; k < Robotmaze.COLS; k++) {
+    for (var k = 0; k < Maze.COLS; k++) {
       var v_line = document.createElementNS(Blockly.SVG_NS, 'line');
-      v_line.setAttribute('x1', k * Robotmaze.SQUARE_SIZE + offset);
-      v_line.setAttribute('x2', k * Robotmaze.SQUARE_SIZE + offset);
-      v_line.setAttribute('y2', Robotmaze.MAZE_HEIGHT);
-      v_line.setAttribute('stroke', Robotmaze.SKIN.graph);
+      v_line.setAttribute('x1', k * Maze.SQUARE_SIZE + offset);
+      v_line.setAttribute('x2', k * Maze.SQUARE_SIZE + offset);
+      v_line.setAttribute('y2', Maze.MAZE_HEIGHT);
+      v_line.setAttribute('stroke', Maze.SKIN.graph);
       v_line.setAttribute('stroke-width', 1);
       svg.appendChild(v_line);
     }
   }
 
-  // Draw the tiles making up the robotmaze map.
+  // Draw the tiles making up the maze map.
 
   // Return a value of '0' if the specified square is wall or out of bounds,
   // '1' otherwise (empty, start, finish).
   var normalize = function(x, y) {
-    if (x < 0 || x >= Robotmaze.COLS || y < 0 || y >= Robotmaze.ROWS) {
+    if (x < 0 || x >= Maze.COLS || y < 0 || y >= Maze.ROWS) {
       return '0';
     }
-    return (Robotmaze.map[y][x] == Robotmaze.SquareType.WALL) ? '0' : '1';
+    return (Maze.map[y][x] == Maze.SquareType.WALL) ? '0' : '1';
   };
 
   // Compute and draw the tile for each square.
   var tileId = 0;
-  for (var y = 0; y < Robotmaze.ROWS; y++) {
-    for (var x = 0; x < Robotmaze.COLS; x++) {
+  for (var y = 0; y < Maze.ROWS; y++) {
+    for (var x = 0; x < Maze.COLS; x++) {
       // Compute the tile shape.
       var tileShape = normalize(x, y) +
           normalize(x, y - 1) +  // North.
@@ -382,7 +382,7 @@ Robotmaze.drawMap = function() {
           normalize(x - 1, y);   // East.
 
       // Draw the tile.
-      if (!Robotmaze.tile_SHAPES[tileShape]) {
+      if (!Maze.tile_SHAPES[tileShape]) {
         // Empty square.  Use null0 for large areas, with null1-4 for borders.
         // Add some randomness to avoid large empty spaces.
         if (tileShape == '00000' && Math.random() > 0.3) {
@@ -391,30 +391,30 @@ Robotmaze.drawMap = function() {
           tileShape = 'null' + Math.floor(1 + Math.random() * 4);
         }
       }
-      var left = Robotmaze.tile_SHAPES[tileShape][0];
-      var top = Robotmaze.tile_SHAPES[tileShape][1];
+      var left = Maze.tile_SHAPES[tileShape][0];
+      var top = Maze.tile_SHAPES[tileShape][1];
       // Tile's clipPath element.
       var tileClip = document.createElementNS(Blockly.SVG_NS, 'clipPath');
       tileClip.setAttribute('id', 'tileClipPath' + tileId);
       var clipRect = document.createElementNS(Blockly.SVG_NS, 'rect');
-      clipRect.setAttribute('width', Robotmaze.SQUARE_SIZE);
-      clipRect.setAttribute('height', Robotmaze.SQUARE_SIZE);
+      clipRect.setAttribute('width', Maze.SQUARE_SIZE);
+      clipRect.setAttribute('height', Maze.SQUARE_SIZE);
 
-      clipRect.setAttribute('x', x * Robotmaze.SQUARE_SIZE);
-      clipRect.setAttribute('y', y * Robotmaze.SQUARE_SIZE);
+      clipRect.setAttribute('x', x * Maze.SQUARE_SIZE);
+      clipRect.setAttribute('y', y * Maze.SQUARE_SIZE);
 
       tileClip.appendChild(clipRect);
       svg.appendChild(tileClip);
       // Tile sprite.
       var tile = document.createElementNS(Blockly.SVG_NS, 'image');
       tile.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
-          Robotmaze.SKIN.tiles);
+          Maze.SKIN.tiles);
       // Position the tile sprite relative to the clipRect.
-      tile.setAttribute('height', Robotmaze.SQUARE_SIZE * 4);
-      tile.setAttribute('width', Robotmaze.SQUARE_SIZE * 5);
+      tile.setAttribute('height', Maze.SQUARE_SIZE * 4);
+      tile.setAttribute('width', Maze.SQUARE_SIZE * 5);
       tile.setAttribute('clip-path', 'url(#tileClipPath' + tileId + ')');
-      tile.setAttribute('x', (x - left) * Robotmaze.SQUARE_SIZE);
-      tile.setAttribute('y', (y - top) * Robotmaze.SQUARE_SIZE);
+      tile.setAttribute('x', (x - left) * Maze.SQUARE_SIZE);
+      tile.setAttribute('y', (y - top) * Maze.SQUARE_SIZE);
       svg.appendChild(tile);
       tileId++;
     }
@@ -424,18 +424,18 @@ Robotmaze.drawMap = function() {
   var finishMarker = document.createElementNS(Blockly.SVG_NS, 'image');
   finishMarker.setAttribute('id', 'finish');
   finishMarker.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
-      Robotmaze.SKIN.marker);
+      Maze.SKIN.marker);
   finishMarker.setAttribute('height', 34);
   finishMarker.setAttribute('width', 20);
   svg.appendChild(finishMarker);
 
-  // Pegman's clipPath element, whose (x, y) is reset by Robotmaze.displayPegman
+  // Pegman's clipPath element, whose (x, y) is reset by Maze.displayPegman
   var pegmanClip = document.createElementNS(Blockly.SVG_NS, 'clipPath');
   pegmanClip.setAttribute('id', 'pegmanClipPath');
   var clipRect = document.createElementNS(Blockly.SVG_NS, 'rect');
   clipRect.setAttribute('id', 'clipRect');
-  clipRect.setAttribute('width', Robotmaze.PEGMAN_WIDTH);
-  clipRect.setAttribute('height', Robotmaze.PEGMAN_HEIGHT);
+  clipRect.setAttribute('width', Maze.PEGMAN_WIDTH);
+  clipRect.setAttribute('height', Maze.PEGMAN_HEIGHT);
   pegmanClip.appendChild(clipRect);
   svg.appendChild(pegmanClip);
 
@@ -443,51 +443,51 @@ Robotmaze.drawMap = function() {
   var pegmanIcon = document.createElementNS(Blockly.SVG_NS, 'image');
   pegmanIcon.setAttribute('id', 'pegman');
   pegmanIcon.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
-      Robotmaze.SKIN.sprite);
-  pegmanIcon.setAttribute('height', Robotmaze.PEGMAN_HEIGHT);
-  pegmanIcon.setAttribute('width', Robotmaze.PEGMAN_WIDTH * 21); // 49 * 21 = 1029
+      Maze.SKIN.sprite);
+  pegmanIcon.setAttribute('height', Maze.PEGMAN_HEIGHT);
+  pegmanIcon.setAttribute('width', Maze.PEGMAN_WIDTH * 21); // 49 * 21 = 1029
   pegmanIcon.setAttribute('clip-path', 'url(#pegmanClipPath)');
   svg.appendChild(pegmanIcon);
 };
 
 /**
- * Initialize Blockly and the robotmaze.  Called on page load.
+ * Initialize Blockly and the maze.  Called on page load.
  */
-Robotmaze.init = function() {
+Maze.init = function() {
   // Render the Soy template.
-  document.body.innerHTML = Robotmaze.soy.start({}, null,
+  document.body.innerHTML = Maze.soy.start({}, null,
       {lang: BlocklyGames.LANG,
        level: BlocklyGames.LEVEL,
        maxLevel: BlocklyGames.MAX_LEVEL,
-       skin: Robotmaze.SKIN_ID,
+       skin: Maze.SKIN_ID,
        html: BlocklyGames.IS_HTML});
 
   BlocklyInterface.init();
 
   // Setup the Pegman menu.
   var pegmanImg = document.querySelector('#pegmanButton>img');
-  pegmanImg.style.backgroundImage = 'url(' + Robotmaze.SKIN.sprite + ')';
+  pegmanImg.style.backgroundImage = 'url(' + Maze.SKIN.sprite + ')';
   var pegmanMenu = document.getElementById('pegmanMenu');
   var handlerFactory = function(n) {
     return function() {
-      Robotmaze.changePegman(n);
+      Maze.changePegman(n);
     };
   };
-  for (var i = 0; i < Robotmaze.SKINS.length; i++) {
-    if (i == Robotmaze.SKIN_ID) {
+  for (var i = 0; i < Maze.SKINS.length; i++) {
+    if (i == Maze.SKIN_ID) {
       continue;
     }
     var div = document.createElement('div');
     var img = document.createElement('img');
     img.src = 'common/1x1.gif';
-    img.style.backgroundImage = 'url(' + Robotmaze.SKINS[i].sprite + ')';
+    img.style.backgroundImage = 'url(' + Maze.SKINS[i].sprite + ')';
     div.appendChild(img);
     pegmanMenu.appendChild(div);
     Blockly.bindEvent_(div, 'mousedown', null, handlerFactory(i));
   }
-  Blockly.bindEvent_(window, 'resize', null, Robotmaze.hidePegmanMenu);
+  Blockly.bindEvent_(window, 'resize', null, Maze.hidePegmanMenu);
   var pegmanButton = document.getElementById('pegmanButton');
-  Blockly.bindEvent_(pegmanButton, 'mousedown', null, Robotmaze.showPegmanMenu);
+  Blockly.bindEvent_(pegmanButton, 'mousedown', null, Maze.showPegmanMenu);
   var pegmanButtonArrow = document.getElementById('pegmanButtonArrow');
   var arrow = document.createTextNode(Blockly.FieldDropdown.ARROW_CHAR);
   pegmanButtonArrow.appendChild(arrow);
@@ -513,44 +513,44 @@ Robotmaze.init = function() {
   var scale = 1 + (1 - (BlocklyGames.LEVEL / BlocklyGames.MAX_LEVEL)) / 3;
   BlocklyGames.workspace = Blockly.inject('blockly',
       {'media': 'third-party/blockly/media/',
-       'maxBlocks': Robotmaze.MAX_BLOCKS,
+       'maxBlocks': Maze.MAX_BLOCKS,
        'rtl': rtl,
        'toolbox': toolbox,
        'trashcan': true,
        'zoom': {'startScale': scale}});
-  BlocklyGames.workspace.getAudioManager().load(Robotmaze.SKIN.winSound, 'win');
-  BlocklyGames.workspace.getAudioManager().load(Robotmaze.SKIN.crashSound, 'fail');
+  BlocklyGames.workspace.getAudioManager().load(Maze.SKIN.winSound, 'win');
+  BlocklyGames.workspace.getAudioManager().load(Maze.SKIN.crashSound, 'fail');
   // Not really needed, there are no user-defined functions or variables.
   Blockly.JavaScript.addReservedWords('moveForward,moveBackward,' +
-      'turnRight,turnLeft,isPathForward,isPathRight,isPathBackward,isPathLeft');
+      'goForward,displayQuestion,detectLocation,senseAndTurn,waitForAnyOf,waitForSpecificOne,waitForAll,turnRight,turnLeft,isPathForward,isPathRight,isPathBackward,isPathLeft');
 
-  Robotmaze.drawMap();
+  Maze.drawMap();
 
   var defaultXml =
       '<xml>' +
       '  <block movable="' + (BlocklyGames.LEVEL != 1) + '" ' +
-      'type="robotmaze_moveForward" x="70" y="70"></block>' +
+      'type="maze_moveForward" x="70" y="70"></block>' +
       '</xml>';
   BlocklyInterface.loadBlocks(defaultXml, false);
 
   // Locate the start and finish squares.
-  for (var y = 0; y < Robotmaze.ROWS; y++) {
-    for (var x = 0; x < Robotmaze.COLS; x++) {
-      if (Robotmaze.map[y][x] == Robotmaze.SquareType.START) {
-        Robotmaze.start_ = {x: x, y: y};
-      } else if (Robotmaze.map[y][x] == Robotmaze.SquareType.FINISH) {
-        Robotmaze.finish_ = {x: x, y: y};
+  for (var y = 0; y < Maze.ROWS; y++) {
+    for (var x = 0; x < Maze.COLS; x++) {
+      if (Maze.map[y][x] == Maze.SquareType.START) {
+        Maze.start_ = {x: x, y: y};
+      } else if (Maze.map[y][x] == Maze.SquareType.FINISH) {
+        Maze.finish_ = {x: x, y: y};
       }
     }
   }
 
-  Robotmaze.reset(true);
-  BlocklyGames.workspace.addChangeListener(function() {Robotmaze.updateCapacity();});
+  Maze.reset(true);
+  BlocklyGames.workspace.addChangeListener(function() {Maze.updateCapacity();});
 
-  document.body.addEventListener('mousemove', Robotmaze.updatePegSpin_, true);
+  document.body.addEventListener('mousemove', Maze.updatePegSpin_, true);
 
-  BlocklyGames.bindClick('runButton', Robotmaze.runButtonClick);
-  BlocklyGames.bindClick('resetButton', Robotmaze.resetButtonClick);
+  BlocklyGames.bindClick('runButton', Maze.runButtonClick);
+  BlocklyGames.bindClick('resetButton', Maze.resetButtonClick);
 
   if (BlocklyGames.LEVEL == 1) {
     // Make connecting blocks easier for beginners.
@@ -577,8 +577,8 @@ Robotmaze.init = function() {
     // All other levels get interactive help.  But wait 5 seconds for the
     // user to think a bit before they are told what to do.
     setTimeout(function() {
-      BlocklyGames.workspace.addChangeListener(Robotmaze.levelHelp);
-      Robotmaze.levelHelp();
+      BlocklyGames.workspace.addChangeListener(Maze.levelHelp);
+      Maze.levelHelp();
     }, 5000);
   }
 
@@ -588,7 +588,7 @@ Robotmaze.init = function() {
   var pegSpin = document.createElement('img');
   pegSpin.id = 'pegSpin';
   pegSpin.src = 'common/1x1.gif';
-  pegSpin.style.backgroundImage = 'url(' + Robotmaze.SKIN.sprite + ')';
+  pegSpin.style.backgroundImage = 'url(' + Maze.SKIN.sprite + ')';
   buttonDiv.parentNode.insertBefore(pegSpin, buttonDiv);
 
   // Lazy-load the JavaScript interpreter.
@@ -601,14 +601,14 @@ Robotmaze.init = function() {
  * When the workspace changes, update the help as needed.
  * @param {Blockly.Events.Abstract=} opt_event Custom data for event.
  */
-Robotmaze.levelHelp = function(opt_event) {
+Maze.levelHelp = function(opt_event) {
   if (opt_event && opt_event.type == Blockly.Events.UI) {
     // Just a change to highlighting or somesuch.
     return;
   } else if (BlocklyGames.workspace.isDragging()) {
     // Don't change helps during drags.
     return;
-  } else if (Robotmaze.result == Robotmaze.ResultType.SUCCESS ||
+  } else if (Maze.result == Maze.ResultType.SUCCESS ||
              BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
                                                BlocklyGames.LEVEL)) {
     // The user has already won.  They are just playing around.
@@ -632,9 +632,9 @@ Robotmaze.levelHelp = function(opt_event) {
       if (topBlocks.length > 1) {
         var xml = [
             '<xml>',
-              '<block type="robotmaze_moveForward" x="10" y="10">',
+              '<block type="maze_moveForward" x="10" y="10">',
                 '<next>',
-                  '<block type="robotmaze_moveForward"></block>',
+                  '<block type="maze_moveForward"></block>',
                 '</next>',
               '</block>',
             '</xml>'];
@@ -643,7 +643,7 @@ Robotmaze.levelHelp = function(opt_event) {
         style = {'width': '360px', 'top': '120px'};
         style[rtl ? 'right' : 'left'] = '225px';
         origin = topBlocks[0].getSvgRoot();
-      } else if (Robotmaze.result == Robotmaze.ResultType.UNSET) {
+      } else if (Maze.result == Maze.ResultType.UNSET) {
         // Show run help dialog.
         content = document.getElementById('dialogHelpRun');
         style = {'width': '360px', 'top': '410px'};
@@ -652,7 +652,7 @@ Robotmaze.levelHelp = function(opt_event) {
       }
     }
   } else if (BlocklyGames.LEVEL == 2) {
-    if (Robotmaze.result != Robotmaze.ResultType.UNSET &&
+    if (Maze.result != Maze.ResultType.UNSET &&
         document.getElementById('runButton').style.display == 'none') {
       content = document.getElementById('dialogHelpReset');
       style = {'width': '360px', 'top': '410px'};
@@ -660,7 +660,7 @@ Robotmaze.levelHelp = function(opt_event) {
       origin = document.getElementById('resetButton');
     }
   } else if (BlocklyGames.LEVEL == 3) {
-    if (userBlocks.indexOf('robotmaze_forever') == -1) {
+    if (userBlocks.indexOf('maze_forever') == -1) {
       if (BlocklyGames.workspace.remainingCapacity() == 0) {
         content = document.getElementById('dialogHelpCapacity');
         style = {'width': '430px', 'top': '310px'};
@@ -675,7 +675,7 @@ Robotmaze.levelHelp = function(opt_event) {
     }
   } else if (BlocklyGames.LEVEL == 4) {
     if (BlocklyGames.workspace.remainingCapacity() == 0 &&
-        (userBlocks.indexOf('robotmaze_forever') == -1 ||
+        (userBlocks.indexOf('maze_forever') == -1 ||
          BlocklyGames.workspace.getTopBlocks(false).length > 1)) {
       content = document.getElementById('dialogHelpCapacity');
       style = {'width': '430px', 'top': '310px'};
@@ -687,7 +687,7 @@ Robotmaze.levelHelp = function(opt_event) {
       var blocks = BlocklyGames.workspace.getAllBlocks();
       for (var i = 0; i < blocks.length; i++) {
         var block = blocks[i];
-        if (block.type != 'robotmaze_forever') {
+        if (block.type != 'maze_forever') {
           continue;
         }
         var j = 0;
@@ -709,28 +709,28 @@ Robotmaze.levelHelp = function(opt_event) {
       }
     }
   } else if (BlocklyGames.LEVEL == 5) {
-    if (Robotmaze.SKIN_ID == 0 && !Robotmaze.showPegmanMenu.activatedOnce) {
+    if (Maze.SKIN_ID == 0 && !Maze.showPegmanMenu.activatedOnce) {
       content = document.getElementById('dialogHelpSkins');
       style = {'width': '360px', 'top': '60px'};
       style[rtl ? 'left' : 'right'] = '20px';
       origin = document.getElementById('pegmanButton');
     }
   } else if (BlocklyGames.LEVEL == 6) {
-    if (userBlocks.indexOf('robotmaze_if') == -1) {
+    if (userBlocks.indexOf('maze_if') == -1) {
       content = document.getElementById('dialogHelpIf');
       style = {'width': '360px', 'top': '430px'};
       style[rtl ? 'right' : 'left'] = '425px';
       origin = toolbar[4].getSvgRoot();
     }
   } else if (BlocklyGames.LEVEL == 7) {
-    if (!Robotmaze.levelHelp.initialized7_) {
+    if (!Maze.levelHelp.initialized7_) {
       // Create fake dropdown.
       var span = document.createElement('span');
       span.className = 'helpMenuFake';
       var options =
-          [BlocklyGames.getMsg('Robotmaze_pathAhead'),
-           BlocklyGames.getMsg('Robotmaze_pathLeft'),
-           BlocklyGames.getMsg('Robotmaze_pathRight')];
+          [BlocklyGames.getMsg('Maze_pathAhead'),
+           BlocklyGames.getMsg('Maze_pathLeft'),
+           BlocklyGames.getMsg('Maze_pathRight')];
       var prefix = Blockly.utils.commonWordPrefix(options);
       var suffix = Blockly.utils.commonWordSuffix(options);
       if (suffix) {
@@ -751,7 +751,7 @@ Robotmaze.levelHelp = function(opt_event) {
           container.appendChild(span.cloneNode(true));
         }
       }
-      Robotmaze.levelHelp.initialized7_ = true;
+      Maze.levelHelp.initialized7_ = true;
     }
     // The hint says to change from 'ahead', but keep the hint visible
     // until the user chooses 'right'.
@@ -762,7 +762,7 @@ Robotmaze.levelHelp = function(opt_event) {
       origin = toolbar[4].getSvgRoot();
     }
   } else if (BlocklyGames.LEVEL == 9) {
-    if (userBlocks.indexOf('robotmaze_ifElse') == -1) {
+    if (userBlocks.indexOf('maze_ifElse') == -1) {
       content = document.getElementById('dialogHelpIfElse');
       style = {'width': '360px', 'top': '305px'};
       style[rtl ? 'right' : 'left'] = '425px';
@@ -782,8 +782,8 @@ Robotmaze.levelHelp = function(opt_event) {
  * Reload with a different Pegman skin.
  * @param {number} newSkin ID of new skin.
  */
-Robotmaze.changePegman = function(newSkin) {
-  Robotmaze.saveToStorage();
+Maze.changePegman = function(newSkin) {
+  Maze.saveToStorage();
   window.location = window.location.protocol + '//' +
       window.location.host + window.location.pathname +
       '?lang=' + BlocklyGames.LANG + '&level=' + BlocklyGames.LEVEL +
@@ -793,7 +793,7 @@ Robotmaze.changePegman = function(newSkin) {
 /**
  * Save the blocks for a one-time reload.
  */
-Robotmaze.saveToStorage = function() {
+Maze.saveToStorage = function() {
   // MSIE 11 does not support sessionStorage on file:// URLs.
   if (typeof Blockly != undefined && window.sessionStorage) {
     var xml = Blockly.Xml.workspaceToDom(BlocklyGames.workspace);
@@ -806,11 +806,11 @@ Robotmaze.saveToStorage = function() {
  * Display the Pegman skin-change menu.
  * @param {!Event} e Mouse, touch, or resize event.
  */
-Robotmaze.showPegmanMenu = function(e) {
+Maze.showPegmanMenu = function(e) {
   var menu = document.getElementById('pegmanMenu');
   if (menu.style.display == 'block') {
     // Menu is already open.  Close it.
-    Robotmaze.hidePegmanMenu(e);
+    Maze.hidePegmanMenu(e);
     return;
   }
   // Prevent double-clicks or double-taps.
@@ -822,67 +822,67 @@ Robotmaze.showPegmanMenu = function(e) {
   menu.style.top = (button.offsetTop + button.offsetHeight) + 'px';
   menu.style.left = button.offsetLeft + 'px';
   menu.style.display = 'block';
-  Robotmaze.pegmanMenuMouse_ =
-      Blockly.bindEvent_(document.body, 'mousedown', null, Robotmaze.hidePegmanMenu);
+  Maze.pegmanMenuMouse_ =
+      Blockly.bindEvent_(document.body, 'mousedown', null, Maze.hidePegmanMenu);
   // Close the skin-changing hint if open.
   var hint = document.getElementById('dialogHelpSkins');
   if (hint && hint.className != 'dialogHiddenContent') {
     BlocklyDialogs.hideDialog(false);
   }
-  Robotmaze.showPegmanMenu.activatedOnce = true;
+  Maze.showPegmanMenu.activatedOnce = true;
 };
 
 /**
  * Hide the Pegman skin-change menu.
  * @param {!Event} e Mouse, touch, or resize event.
  */
-Robotmaze.hidePegmanMenu = function(e) {
+Maze.hidePegmanMenu = function(e) {
   // Prevent double-clicks or double-taps.
   if (BlocklyInterface.eventSpam(e)) {
     return;
   }
   document.getElementById('pegmanMenu').style.display = 'none';
   document.getElementById('pegmanButton').classList.remove('buttonHover');
-  if (Robotmaze.pegmanMenuMouse_) {
-    Blockly.unbindEvent_(Robotmaze.pegmanMenuMouse_);
-    delete Robotmaze.pegmanMenuMouse_;
+  if (Maze.pegmanMenuMouse_) {
+    Blockly.unbindEvent_(Maze.pegmanMenuMouse_);
+    delete Maze.pegmanMenuMouse_;
   }
 };
 
 /**
- * Reset the robotmaze to the start position and kill any pending animation tasks.
+ * Reset the maze to the start position and kill any pending animation tasks.
  * @param {boolean} first True if an opening animation is to be played.
  */
-Robotmaze.reset = function(first) {
+Maze.reset = function(first) {
   // Kill all tasks.
-  for (var i = 0; i < Robotmaze.pidList.length; i++) {
-    window.clearTimeout(Robotmaze.pidList[i]);
+  for (var i = 0; i < Maze.pidList.length; i++) {
+    window.clearTimeout(Maze.pidList[i]);
   }
-  Robotmaze.pidList = [];
+  Maze.pidList = [];
 
   // Move Pegman into position.
-  Robotmaze.pegmanX = Robotmaze.start_.x;
-  Robotmaze.pegmanY = Robotmaze.start_.y;
+  Maze.pegmanX = Maze.start_.x;
+  Maze.pegmanY = Maze.start_.y;
 
   if (first) {
-    Robotmaze.pegmanD = Robotmaze.startDirection + 1;
-    Robotmaze.scheduleFinish(false);
-    Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.stepSpeed = 100;
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4 - 4]);
-      Robotmaze.pegmanD++;
-    }, Robotmaze.stepSpeed * 5));
+    Maze.pegmanD = Maze.startDirection + 1;
+    Maze.scheduleFinish(false);
+    Maze.pidList.push(setTimeout(function() {
+      Maze.stepSpeed = 100;
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4 - 4]);
+      Maze.pegmanD++;
+    }, Maze.stepSpeed * 5));
   } else {
-    Robotmaze.pegmanD = Robotmaze.startDirection;
-    Robotmaze.displayPegman(Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4);
+    Maze.pegmanD = Maze.startDirection;
+    Maze.displayPegman(Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4);
   }
 
   // Move the finish icon into position.
   var finishIcon = document.getElementById('finish');
-  finishIcon.setAttribute('x', Robotmaze.SQUARE_SIZE * (Robotmaze.finish_.x + 0.5) -
+  finishIcon.setAttribute('x', Maze.SQUARE_SIZE * (Maze.finish_.x + 0.5) -
       finishIcon.getAttribute('width') / 2);
-  finishIcon.setAttribute('y', Robotmaze.SQUARE_SIZE * (Robotmaze.finish_.y + 0.6) -
+  finishIcon.setAttribute('y', Maze.SQUARE_SIZE * (Maze.finish_.y + 0.6) -
       finishIcon.getAttribute('height'));
 
   // Make 'look' icon invisible and promote to top.
@@ -891,7 +891,7 @@ Robotmaze.reset = function(first) {
   lookIcon.parentNode.appendChild(lookIcon);
   var paths = lookIcon.getElementsByTagName('path');
   for (var i = 0, path; (path = paths[i]); i++) {
-    path.setAttribute('stroke', Robotmaze.SKIN.look);
+    path.setAttribute('stroke', Maze.SKIN.look);
   }
 };
 
@@ -899,7 +899,7 @@ Robotmaze.reset = function(first) {
  * Click the run button.  Start the program.
  * @param {!Event} e Mouse or touch event.
  */
-Robotmaze.runButtonClick = function(e) {
+Maze.runButtonClick = function(e) {
   // Prevent double-clicks or double-taps.
   if (BlocklyInterface.eventSpam(e)) {
     return;
@@ -908,10 +908,10 @@ Robotmaze.runButtonClick = function(e) {
   // Only allow a single top block on level 1.
   if (BlocklyGames.LEVEL == 1 &&
       BlocklyGames.workspace.getTopBlocks(false).length > 1 &&
-      Robotmaze.result != Robotmaze.ResultType.SUCCESS &&
+      Maze.result != Maze.ResultType.SUCCESS &&
       !BlocklyGames.loadFromLocalStorage(BlocklyGames.NAME,
                                          BlocklyGames.LEVEL)) {
-    Robotmaze.levelHelp();
+    Maze.levelHelp();
     return;
   }
   var runButton = document.getElementById('runButton');
@@ -922,8 +922,8 @@ Robotmaze.runButtonClick = function(e) {
   }
   runButton.style.display = 'none';
   resetButton.style.display = 'inline';
-  Robotmaze.reset(false);
-  Robotmaze.execute();
+  Maze.reset(false);
+  Maze.execute();
 };
 
 /**
@@ -931,7 +931,7 @@ Robotmaze.runButtonClick = function(e) {
  * indicating how many more blocks are permitted.  The capacity
  * is retrieved from BlocklyGames.workspace.remainingCapacity().
  */
-Robotmaze.updateCapacity = function() {
+Maze.updateCapacity = function() {
   var cap = BlocklyGames.workspace.remainingCapacity();
   var p = document.getElementById('capacity');
   if (cap == Infinity) {
@@ -944,11 +944,11 @@ Robotmaze.updateCapacity = function() {
     capSpan.className = 'capacityNumber';
     capSpan.appendChild(document.createTextNode(cap));
     if (cap == 0) {
-      var msg = BlocklyGames.getMsg('Robotmaze_capacity0');
+      var msg = BlocklyGames.getMsg('Maze_capacity0');
     } else if (cap == 1) {
-      var msg = BlocklyGames.getMsg('Robotmaze_capacity1');
+      var msg = BlocklyGames.getMsg('Maze_capacity1');
     } else {
-      var msg = BlocklyGames.getMsg('Robotmaze_capacity2');
+      var msg = BlocklyGames.getMsg('Maze_capacity2');
     }
     var parts = msg.split(/%\d/);
     for (var i = 0; i < parts.length; i++) {
@@ -961,10 +961,10 @@ Robotmaze.updateCapacity = function() {
 };
 
 /**
- * Click the reset button.  Reset the robotmaze.
+ * Click the reset button.  Reset the maze.
  * @param {!Event} e Mouse or touch event.
  */
-Robotmaze.resetButtonClick = function(e) {
+Maze.resetButtonClick = function(e) {
   // Prevent double-clicks or double-taps.
   if (BlocklyInterface.eventSpam(e)) {
     return;
@@ -973,60 +973,65 @@ Robotmaze.resetButtonClick = function(e) {
   runButton.style.display = 'inline';
   document.getElementById('resetButton').style.display = 'none';
   BlocklyGames.workspace.highlightBlock(null);
-  Robotmaze.reset(false);
-  Robotmaze.levelHelp();
+  Maze.reset(false);
+  Maze.levelHelp();
 };
 
 /**
- * Inject the Robotmaze API into a JavaScript interpreter.
+ * Inject the Maze API into a JavaScript interpreter.
  * @param {!Interpreter} interpreter The JS Interpreter.
  * @param {!Interpreter.Object} scope Global scope.
  */
-Robotmaze.initInterpreter = function(interpreter, scope) {
+Maze.initInterpreter = function(interpreter, scope) {
   // API
   var wrapper;
   wrapper = function(id) {
-    Robotmaze.move(0, id);
+    Maze.move(0, id);
   };
   interpreter.setProperty(scope, 'moveForward',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    Robotmaze.move(2, id);
+    Maze.move(0, id);
+  };
+  interpreter.setProperty(scope, 'goForward',
+      interpreter.createNativeFunction(wrapper));
+  wrapper = function(id) {
+    Maze.move(2, id);
   };
   interpreter.setProperty(scope, 'moveBackward',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    Robotmaze.turn(0, id);
+    Maze.turn(0, id);
   };
   interpreter.setProperty(scope, 'turnLeft',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    Robotmaze.turn(1, id);
+    Maze.turn(1, id);
   };
   interpreter.setProperty(scope, 'turnRight',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    return Robotmaze.isPath(0, id);
+    return Maze.isPath(0, id);
   };
   interpreter.setProperty(scope, 'isPathForward',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    return Robotmaze.isPath(1, id);
+    return Maze.isPath(1, id);
   };
   interpreter.setProperty(scope, 'isPathRight',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    return Robotmaze.isPath(2, id);
+    return Maze.isPath(2, id);
   };
   interpreter.setProperty(scope, 'isPathBackward',
       interpreter.createNativeFunction(wrapper));
   wrapper = function(id) {
-    return Robotmaze.isPath(3, id);
+    return Maze.isPath(3, id);
   };
   interpreter.setProperty(scope, 'isPathLeft',
       interpreter.createNativeFunction(wrapper));
   wrapper = function() {
-    return Robotmaze.notDone();
+    return Maze.notDone();
   };
   interpreter.setProperty(scope, 'notDone',
       interpreter.createNativeFunction(wrapper));
@@ -1035,25 +1040,25 @@ Robotmaze.initInterpreter = function(interpreter, scope) {
 /**
  * Execute the user's code.  Heaven help us...
  */
-Robotmaze.execute = function() {
+Maze.execute = function() {
   if (!('Interpreter' in window)) {
     // Interpreter lazy loads and hasn't arrived yet.  Try again later.
-    setTimeout(Robotmaze.execute, 250);
+    setTimeout(Maze.execute, 250);
     return;
   }
 
-  Robotmaze.log = [];
+  Maze.log = [];
   Blockly.selected && Blockly.selected.unselect();
   var code = Blockly.JavaScript.workspaceToCode(BlocklyGames.workspace);
-  Robotmaze.result = Robotmaze.ResultType.UNSET;
-  var interpreter = new Interpreter(code, Robotmaze.initInterpreter);
+  Maze.result = Maze.ResultType.UNSET;
+  var interpreter = new Interpreter(code, Maze.initInterpreter);
 
   // Try running the user's code.  There are four possible outcomes:
   // 1. If pegman reaches the finish [SUCCESS], true is thrown.
   // 2. If the program is terminated due to running too long [TIMEOUT],
   //    false is thrown.
   // 3. If another error occurs [ERROR], that error is thrown.
-  // 4. If the program ended normally but without solving the robotmaze [FAILURE],
+  // 4. If the program ended normally but without solving the maze [FAILURE],
   //    no error or exception is thrown.
   try {
     var ticks = 10000;  // 10k ticks runs Pegman for about 8 minutes.
@@ -1062,104 +1067,104 @@ Robotmaze.execute = function() {
         throw Infinity;
       }
     }
-    Robotmaze.result = Robotmaze.notDone() ?
-        Robotmaze.ResultType.FAILURE : Robotmaze.ResultType.SUCCESS;
+    Maze.result = Maze.notDone() ?
+        Maze.ResultType.FAILURE : Maze.ResultType.SUCCESS;
   } catch (e) {
     // A boolean is thrown for normal termination.
     // Abnormal termination is a user error.
     if (e === Infinity) {
-      Robotmaze.result = Robotmaze.ResultType.TIMEOUT;
+      Maze.result = Maze.ResultType.TIMEOUT;
     } else if (e === false) {
-      Robotmaze.result = Robotmaze.ResultType.ERROR;
+      Maze.result = Maze.ResultType.ERROR;
     } else {
       // Syntax error, can't happen.
-      Robotmaze.result = Robotmaze.ResultType.ERROR;
+      Maze.result = Maze.ResultType.ERROR;
       alert(e);
     }
   }
 
   // Fast animation if execution is successful.  Slow otherwise.
-  if (Robotmaze.result == Robotmaze.ResultType.SUCCESS) {
-    Robotmaze.stepSpeed = 100;
-    Robotmaze.log.push(['finish', null]);
+  if (Maze.result == Maze.ResultType.SUCCESS) {
+    Maze.stepSpeed = 100;
+    Maze.log.push(['finish', null]);
   } else {
-    Robotmaze.stepSpeed = 150;
+    Maze.stepSpeed = 150;
   }
 
-  // Robotmaze.log now contains a transcript of all the user's actions.
-  // Reset the robotmaze and animate the transcript.
-  Robotmaze.reset(false);
-  Robotmaze.pidList.push(setTimeout(Robotmaze.animate, 100));
+  // Maze.log now contains a transcript of all the user's actions.
+  // Reset the maze and animate the transcript.
+  Maze.reset(false);
+  Maze.pidList.push(setTimeout(Maze.animate, 100));
 };
 
 /**
  * Iterate through the recorded path and animate pegman's actions.
  */
-Robotmaze.animate = function() {
-  var action = Robotmaze.log.shift();
+Maze.animate = function() {
+  var action = Maze.log.shift();
   if (!action) {
     BlocklyInterface.highlight(null);
-    Robotmaze.levelHelp();
+    Maze.levelHelp();
     return;
   }
   BlocklyInterface.highlight(action[1]);
 
   switch (action[0]) {
     case 'north':
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX, Robotmaze.pegmanY - 1, Robotmaze.pegmanD * 4]);
-      Robotmaze.pegmanY--;
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX, Maze.pegmanY - 1, Maze.pegmanD * 4]);
+      Maze.pegmanY -= 2;
       break;
     case 'east':
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX + 1, Robotmaze.pegmanY, Robotmaze.pegmanD * 4]);
-      Robotmaze.pegmanX++;
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX + 1, Maze.pegmanY, Maze.pegmanD * 4]);
+      Maze.pegmanX += 2;
       break;
     case 'south':
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX, Robotmaze.pegmanY + 1, Robotmaze.pegmanD * 4]);
-      Robotmaze.pegmanY++;
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX, Maze.pegmanY + 1, Maze.pegmanD * 4]);
+      Maze.pegmanY += 2;
       break;
     case 'west':
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX - 1, Robotmaze.pegmanY, Robotmaze.pegmanD * 4]);
-      Robotmaze.pegmanX--;
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX - 1, Maze.pegmanY, Maze.pegmanD * 4]);
+      Maze.pegmanX -= 2;
       break;
     case 'look_north':
-      Robotmaze.scheduleLook(Robotmaze.DirectionType.NORTH);
+      Maze.scheduleLook(Maze.DirectionType.NORTH);
       break;
     case 'look_east':
-      Robotmaze.scheduleLook(Robotmaze.DirectionType.EAST);
+      Maze.scheduleLook(Maze.DirectionType.EAST);
       break;
     case 'look_south':
-      Robotmaze.scheduleLook(Robotmaze.DirectionType.SOUTH);
+      Maze.scheduleLook(Maze.DirectionType.SOUTH);
       break;
     case 'look_west':
-      Robotmaze.scheduleLook(Robotmaze.DirectionType.WEST);
+      Maze.scheduleLook(Maze.DirectionType.WEST);
       break;
     case 'fail_forward':
-      Robotmaze.scheduleFail(true);
+      Maze.scheduleFail(true);
       break;
     case 'fail_backward':
-      Robotmaze.scheduleFail(false);
+      Maze.scheduleFail(false);
       break;
     case 'left':
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4 - 4]);
-      Robotmaze.pegmanD = Robotmaze.constrainDirection4(Robotmaze.pegmanD - 1);
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4 - 4]);
+      Maze.pegmanD = Maze.constrainDirection4(Maze.pegmanD - 1);
       break;
     case 'right':
-      Robotmaze.schedule([Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4],
-                    [Robotmaze.pegmanX, Robotmaze.pegmanY, Robotmaze.pegmanD * 4 + 4]);
-      Robotmaze.pegmanD = Robotmaze.constrainDirection4(Robotmaze.pegmanD + 1);
+      Maze.schedule([Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4],
+                    [Maze.pegmanX, Maze.pegmanY, Maze.pegmanD * 4 + 4]);
+      Maze.pegmanD = Maze.constrainDirection4(Maze.pegmanD + 1);
       break;
     case 'finish':
-      Robotmaze.scheduleFinish(true);
+      Maze.scheduleFinish(true);
       BlocklyInterface.saveToLocalStorage();
       setTimeout(BlocklyDialogs.congratulations, 1000);
   }
 
-  Robotmaze.pidList.push(setTimeout(Robotmaze.animate, Robotmaze.stepSpeed * 5));
+  Maze.pidList.push(setTimeout(Maze.animate, Maze.stepSpeed * 5));
 };
 
 /**
@@ -1167,7 +1172,7 @@ Robotmaze.animate = function() {
  * @param {Event} e Mouse move event.
  * @private
  */
-Robotmaze.updatePegSpin_ = function(e) {
+Maze.updatePegSpin_ = function(e) {
   if (document.getElementById('dialogDone').className ==
       'dialogHiddenContent') {
     return;
@@ -1193,7 +1198,7 @@ Robotmaze.updatePegSpin_ = function(e) {
     quad = 15;
   }
   // Display correct Pegman sprite.
-  pegSpin.style.backgroundPosition = (-quad * Robotmaze.PEGMAN_WIDTH) + 'px 0px';
+  pegSpin.style.backgroundPosition = (-quad * Maze.PEGMAN_WIDTH) + 'px 0px';
 };
 
 /**
@@ -1201,47 +1206,47 @@ Robotmaze.updatePegSpin_ = function(e) {
  * @param {!Array.<number>} startPos X, Y and direction starting points.
  * @param {!Array.<number>} endPos X, Y and direction ending points.
  */
-Robotmaze.schedule = function(startPos, endPos) {
+Maze.schedule = function(startPos, endPos) {
   var deltas = [(endPos[0] - startPos[0]) / 4,
                 (endPos[1] - startPos[1]) / 4,
                 (endPos[2] - startPos[2]) / 4];
-  Robotmaze.displayPegman(startPos[0] + deltas[0],
+  Maze.displayPegman(startPos[0] + deltas[0],
                      startPos[1] + deltas[1],
-                     Robotmaze.constrainDirection16(startPos[2] + deltas[2]));
-  Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.displayPegman(startPos[0] + deltas[0] * 2,
+                     Maze.constrainDirection16(startPos[2] + deltas[2]));
+  Maze.pidList.push(setTimeout(function() {
+      Maze.displayPegman(startPos[0] + deltas[0] * 2,
           startPos[1] + deltas[1] * 2,
-          Robotmaze.constrainDirection16(startPos[2] + deltas[2] * 2));
-    }, Robotmaze.stepSpeed));
-  Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.displayPegman(startPos[0] + deltas[0] * 3,
+          Maze.constrainDirection16(startPos[2] + deltas[2] * 2));
+    }, Maze.stepSpeed));
+  Maze.pidList.push(setTimeout(function() {
+      Maze.displayPegman(startPos[0] + deltas[0] * 3,
           startPos[1] + deltas[1] * 3,
-          Robotmaze.constrainDirection16(startPos[2] + deltas[2] * 3));
-    }, Robotmaze.stepSpeed * 2));
-  Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.displayPegman(endPos[0], endPos[1],
-          Robotmaze.constrainDirection16(endPos[2]));
-    }, Robotmaze.stepSpeed * 3));
+          Maze.constrainDirection16(startPos[2] + deltas[2] * 3));
+    }, Maze.stepSpeed * 2));
+  Maze.pidList.push(setTimeout(function() {
+      Maze.displayPegman(endPos[0], endPos[1],
+          Maze.constrainDirection16(endPos[2]));
+    }, Maze.stepSpeed * 3));
 };
 
 /**
  * Schedule the animations and sounds for a failed move.
  * @param {boolean} forward True if forward, false if backward.
  */
-Robotmaze.scheduleFail = function(forward) {
+Maze.scheduleFail = function(forward) {
   var deltaX = 0;
   var deltaY = 0;
-  switch (Robotmaze.pegmanD) {
-    case Robotmaze.DirectionType.NORTH:
+  switch (Maze.pegmanD) {
+    case Maze.DirectionType.NORTH:
       deltaY = -1;
       break;
-    case Robotmaze.DirectionType.EAST:
+    case Maze.DirectionType.EAST:
       deltaX = 1;
       break;
-    case Robotmaze.DirectionType.SOUTH:
+    case Maze.DirectionType.SOUTH:
       deltaY = 1;
       break;
-    case Robotmaze.DirectionType.WEST:
+    case Maze.DirectionType.WEST:
       deltaX = -1;
       break;
   }
@@ -1249,29 +1254,29 @@ Robotmaze.scheduleFail = function(forward) {
     deltaX = -deltaX;
     deltaY = -deltaY;
   }
-  if (Robotmaze.SKIN.crashType == Robotmaze.CRASH_STOP) {
+  if (Maze.SKIN.crashType == Maze.CRASH_STOP) {
     // Bounce bounce.
     deltaX /= 4;
     deltaY /= 4;
-    var direction16 = Robotmaze.constrainDirection16(Robotmaze.pegmanD * 4);
-    Robotmaze.displayPegman(Robotmaze.pegmanX + deltaX,
-                       Robotmaze.pegmanY + deltaY,
+    var direction16 = Maze.constrainDirection16(Maze.pegmanD * 4);
+    Maze.displayPegman(Maze.pegmanX + deltaX,
+                       Maze.pegmanY + deltaY,
                        direction16);
     BlocklyGames.workspace.getAudioManager().play('fail', 0.5);
-    Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.displayPegman(Robotmaze.pegmanX,
-                         Robotmaze.pegmanY,
+    Maze.pidList.push(setTimeout(function() {
+      Maze.displayPegman(Maze.pegmanX,
+                         Maze.pegmanY,
                          direction16);
-      }, Robotmaze.stepSpeed));
-    Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.displayPegman(Robotmaze.pegmanX + deltaX,
-                         Robotmaze.pegmanY + deltaY,
+      }, Maze.stepSpeed));
+    Maze.pidList.push(setTimeout(function() {
+      Maze.displayPegman(Maze.pegmanX + deltaX,
+                         Maze.pegmanY + deltaY,
                          direction16);
       BlocklyGames.workspace.getAudioManager().play('fail', 0.5);
-    }, Robotmaze.stepSpeed * 2));
-    Robotmaze.pidList.push(setTimeout(function() {
-        Robotmaze.displayPegman(Robotmaze.pegmanX, Robotmaze.pegmanY, direction16);
-      }, Robotmaze.stepSpeed * 3));
+    }, Maze.stepSpeed * 2));
+    Maze.pidList.push(setTimeout(function() {
+        Maze.displayPegman(Maze.pegmanX, Maze.pegmanY, direction16);
+      }, Maze.stepSpeed * 3));
   } else {
     // Add a small random delta away from the grid.
     var deltaZ = (Math.random() - 0.5) * 10;
@@ -1281,18 +1286,18 @@ Robotmaze.scheduleFail = function(forward) {
     deltaX /= 8;
     deltaY /= 8;
     var acceleration = 0;
-    if (Robotmaze.SKIN.crashType == Robotmaze.CRASH_FALL) {
+    if (Maze.SKIN.crashType == Maze.CRASH_FALL) {
       acceleration = 0.01;
     }
-    Robotmaze.pidList.push(setTimeout(function() {
+    Maze.pidList.push(setTimeout(function() {
       BlocklyGames.workspace.getAudioManager().play('fail', 0.5);
-    }, Robotmaze.stepSpeed * 2));
+    }, Maze.stepSpeed * 2));
     var setPosition = function(n) {
       return function() {
-        var direction16 = Robotmaze.constrainDirection16(Robotmaze.pegmanD * 4 +
+        var direction16 = Maze.constrainDirection16(Maze.pegmanD * 4 +
                                                     deltaD * n);
-        Robotmaze.displayPegman(Robotmaze.pegmanX + deltaX * n,
-                           Robotmaze.pegmanY + deltaY * n,
+        Maze.displayPegman(Maze.pegmanX + deltaX * n,
+                           Maze.pegmanY + deltaY * n,
                            direction16,
                            deltaZ * n);
         deltaY += acceleration;
@@ -1300,8 +1305,8 @@ Robotmaze.scheduleFail = function(forward) {
     };
     // 100 frames should get Pegman offscreen.
     for (var i = 1; i < 100; i++) {
-      Robotmaze.pidList.push(setTimeout(setPosition(i),
-          Robotmaze.stepSpeed * i / 2));
+      Maze.pidList.push(setTimeout(setPosition(i),
+          Maze.stepSpeed * i / 2));
     }
   }
 };
@@ -1310,22 +1315,22 @@ Robotmaze.scheduleFail = function(forward) {
  * Schedule the animations and sound for a victory dance.
  * @param {boolean} sound Play the victory sound.
  */
-Robotmaze.scheduleFinish = function(sound) {
-  var direction16 = Robotmaze.constrainDirection16(Robotmaze.pegmanD * 4);
-  Robotmaze.displayPegman(Robotmaze.pegmanX, Robotmaze.pegmanY, 16);
+Maze.scheduleFinish = function(sound) {
+  var direction16 = Maze.constrainDirection16(Maze.pegmanD * 4);
+  Maze.displayPegman(Maze.pegmanX, Maze.pegmanY, 16);
   if (sound) {
     BlocklyGames.workspace.getAudioManager().play('win', 0.5);
   }
-  Robotmaze.stepSpeed = 150;  // Slow down victory animation a bit.
-  Robotmaze.pidList.push(setTimeout(function() {
-    Robotmaze.displayPegman(Robotmaze.pegmanX, Robotmaze.pegmanY, 18);
-    }, Robotmaze.stepSpeed));
-  Robotmaze.pidList.push(setTimeout(function() {
-    Robotmaze.displayPegman(Robotmaze.pegmanX, Robotmaze.pegmanY, 16);
-    }, Robotmaze.stepSpeed * 2));
-  Robotmaze.pidList.push(setTimeout(function() {
-      Robotmaze.displayPegman(Robotmaze.pegmanX, Robotmaze.pegmanY, direction16);
-    }, Robotmaze.stepSpeed * 3));
+  Maze.stepSpeed = 150;  // Slow down victory animation a bit.
+  Maze.pidList.push(setTimeout(function() {
+    Maze.displayPegman(Maze.pegmanX, Maze.pegmanY, 18);
+    }, Maze.stepSpeed));
+  Maze.pidList.push(setTimeout(function() {
+    Maze.displayPegman(Maze.pegmanX, Maze.pegmanY, 16);
+    }, Maze.stepSpeed * 2));
+  Maze.pidList.push(setTimeout(function() {
+      Maze.displayPegman(Maze.pegmanX, Maze.pegmanY, direction16);
+    }, Maze.stepSpeed * 3));
 };
 
 /**
@@ -1335,51 +1340,51 @@ Robotmaze.scheduleFinish = function(sound) {
  * @param {number} d Direction (0 - 15) or dance (16 - 17).
  * @param {number=} opt_angle Optional angle (in degrees) to rotate Pegman.
  */
-Robotmaze.displayPegman = function(x, y, d, opt_angle) {
+Maze.displayPegman = function(x, y, d, opt_angle) {
   var pegmanIcon = document.getElementById('pegman');
   pegmanIcon.setAttribute('x',
-      x * Robotmaze.SQUARE_SIZE - d * Robotmaze.PEGMAN_WIDTH + 1);
+      x * Maze.SQUARE_SIZE - d * Maze.PEGMAN_WIDTH + 1);
   pegmanIcon.setAttribute('y',
-      Robotmaze.SQUARE_SIZE * (y + 0.5) - Robotmaze.PEGMAN_HEIGHT / 2 - 8);
+      Maze.SQUARE_SIZE * (y + 0.5) - Maze.PEGMAN_HEIGHT / 2 - 8);
   if (opt_angle) {
     pegmanIcon.setAttribute('transform', 'rotate(' + opt_angle + ', ' +
-        (x * Robotmaze.SQUARE_SIZE + Robotmaze.SQUARE_SIZE / 2) + ', ' +
-        (y * Robotmaze.SQUARE_SIZE + Robotmaze.SQUARE_SIZE / 2) + ')');
+        (x * Maze.SQUARE_SIZE + Maze.SQUARE_SIZE / 2) + ', ' +
+        (y * Maze.SQUARE_SIZE + Maze.SQUARE_SIZE / 2) + ')');
   } else {
     pegmanIcon.setAttribute('transform', 'rotate(0, 0, 0)');
   }
 
   var clipRect = document.getElementById('clipRect');
-  clipRect.setAttribute('x', x * Robotmaze.SQUARE_SIZE + 1);
+  clipRect.setAttribute('x', x * Maze.SQUARE_SIZE + 1);
   clipRect.setAttribute('y', pegmanIcon.getAttribute('y'));
 };
 
 /**
  * Display the look icon at Pegman's current location,
  * in the specified direction.
- * @param {!Robotmaze.DirectionType} d Direction (0 - 3).
+ * @param {!Maze.DirectionType} d Direction (0 - 3).
  */
-Robotmaze.scheduleLook = function(d) {
-  var x = Robotmaze.pegmanX;
-  var y = Robotmaze.pegmanY;
+Maze.scheduleLook = function(d) {
+  var x = Maze.pegmanX;
+  var y = Maze.pegmanY;
   switch (d) {
-    case Robotmaze.DirectionType.NORTH:
+    case Maze.DirectionType.NORTH:
       x += 0.5;
       break;
-    case Robotmaze.DirectionType.EAST:
+    case Maze.DirectionType.EAST:
       x += 1;
       y += 0.5;
       break;
-    case Robotmaze.DirectionType.SOUTH:
+    case Maze.DirectionType.SOUTH:
       x += 0.5;
       y += 1;
       break;
-    case Robotmaze.DirectionType.WEST:
+    case Maze.DirectionType.WEST:
       y += 0.5;
       break;
   }
-  x *= Robotmaze.SQUARE_SIZE;
-  y *= Robotmaze.SQUARE_SIZE;
+  x *= Maze.SQUARE_SIZE;
+  y *= Maze.SQUARE_SIZE;
   var deg = d * 90 - 45;
 
   var lookIcon = document.getElementById('look');
@@ -1389,7 +1394,7 @@ Robotmaze.scheduleLook = function(d) {
   var paths = lookIcon.getElementsByTagName('path');
   lookIcon.style.display = 'inline';
   for (var i = 0, path; (path = paths[i]); i++) {
-    Robotmaze.scheduleLookStep(path, Robotmaze.stepSpeed * i);
+    Maze.scheduleLookStep(path, Maze.stepSpeed * i);
   }
 };
 
@@ -1398,12 +1403,12 @@ Robotmaze.scheduleLook = function(d) {
  * @param {!Element} path Element to make appear.
  * @param {number} delay Milliseconds to wait before making wave appear.
  */
-Robotmaze.scheduleLookStep = function(path, delay) {
-  Robotmaze.pidList.push(setTimeout(function() {
+Maze.scheduleLookStep = function(path, delay) {
+  Maze.pidList.push(setTimeout(function() {
     path.style.display = 'inline';
     setTimeout(function() {
       path.style.display = 'none';
-    }, Robotmaze.stepSpeed * 2);
+    }, Maze.stepSpeed * 2);
   }, delay));
 };
 
@@ -1412,7 +1417,7 @@ Robotmaze.scheduleLookStep = function(path, delay) {
  * @param {number} d Potentially out-of-bounds direction value.
  * @return {number} Legal direction value.
  */
-Robotmaze.constrainDirection4 = function(d) {
+Maze.constrainDirection4 = function(d) {
   d = Math.round(d) % 4;
   if (d < 0) {
     d += 4;
@@ -1425,7 +1430,7 @@ Robotmaze.constrainDirection4 = function(d) {
  * @param {number} d Potentially out-of-bounds direction value.
  * @return {number} Legal direction value.
  */
-Robotmaze.constrainDirection16 = function(d) {
+Maze.constrainDirection16 = function(d) {
   d = Math.round(d) % 16;
   if (d < 0) {
     d += 16;
@@ -1439,36 +1444,36 @@ Robotmaze.constrainDirection16 = function(d) {
  * Attempt to move pegman forward or backward.
  * @param {number} direction Direction to move (0 = forward, 2 = backward).
  * @param {string} id ID of block that triggered this action.
- * @throws {true} If the end of the robotmaze is reached.
+ * @throws {true} If the end of the maze is reached.
  * @throws {false} If Pegman collides with a wall.
  */
-Robotmaze.move = function(direction, id) {
-  if (!Robotmaze.isPath(direction, null)) {
-    Robotmaze.log.push(['fail_' + (direction ? 'backward' : 'forward'), id]);
+Maze.move = function(direction, id) {
+  if (!Maze.isPath(direction, null)) {
+    Maze.log.push(['fail_' + (direction ? 'backward' : 'forward'), id]);
     throw false;
   }
   // If moving backward, flip the effective direction.
-  var effectiveDirection = Robotmaze.pegmanD + direction;
+  var effectiveDirection = Maze.pegmanD + direction;
   var command;
-  switch (Robotmaze.constrainDirection4(effectiveDirection)) {
-    case Robotmaze.DirectionType.NORTH:
-      Robotmaze.pegmanY--;
+  switch (Maze.constrainDirection4(effectiveDirection)) {
+    case Maze.DirectionType.NORTH:
+      Maze.pegmanY -= 2;
       command = 'north';
       break;
-    case Robotmaze.DirectionType.EAST:
-      Robotmaze.pegmanX++;
+    case Maze.DirectionType.EAST:
+      Maze.pegmanX += 2;
       command = 'east';
       break;
-    case Robotmaze.DirectionType.SOUTH:
-      Robotmaze.pegmanY++;
+    case Maze.DirectionType.SOUTH:
+      Maze.pegmanY += 2;
       command = 'south';
       break;
-    case Robotmaze.DirectionType.WEST:
-      Robotmaze.pegmanX--;
+    case Maze.DirectionType.WEST:
+      Maze.pegmanX -= 2;
       command = 'west';
       break;
   }
-  Robotmaze.log.push([command, id]);
+  Maze.log.push([command, id]);
 };
 
 /**
@@ -1476,17 +1481,17 @@ Robotmaze.move = function(direction, id) {
  * @param {number} direction Direction to turn (0 = left, 1 = right).
  * @param {string} id ID of block that triggered this action.
  */
-Robotmaze.turn = function(direction, id) {
+Maze.turn = function(direction, id) {
   if (direction) {
     // Right turn (clockwise).
-    Robotmaze.pegmanD++;
-    Robotmaze.log.push(['right', id]);
+    Maze.pegmanD++;
+    Maze.log.push(['right', id]);
   } else {
     // Left turn (counterclockwise).
-    Robotmaze.pegmanD--;
-    Robotmaze.log.push(['left', id]);
+    Maze.pegmanD--;
+    Maze.log.push(['left', id]);
   }
-  Robotmaze.pegmanD = Robotmaze.constrainDirection4(Robotmaze.pegmanD);
+  Maze.pegmanD = Maze.constrainDirection4(Maze.pegmanD);
 };
 
 /**
@@ -1494,45 +1499,45 @@ Robotmaze.turn = function(direction, id) {
  * @param {number} direction Direction to look
  *     (0 = forward, 1 = right, 2 = backward, 3 = left).
  * @param {?string} id ID of block that triggered this action.
- *     Null if called as a helper function in Robotmaze.move().
+ *     Null if called as a helper function in Maze.move().
  * @return {boolean} True if there is a path.
  */
-Robotmaze.isPath = function(direction, id) {
-  var effectiveDirection = Robotmaze.pegmanD + direction;
+Maze.isPath = function(direction, id) {
+  var effectiveDirection = Maze.pegmanD + direction;
   var square;
   var command;
-  switch (Robotmaze.constrainDirection4(effectiveDirection)) {
-    case Robotmaze.DirectionType.NORTH:
-      square = Robotmaze.map[Robotmaze.pegmanY - 1] &&
-          Robotmaze.map[Robotmaze.pegmanY - 1][Robotmaze.pegmanX];
+  switch (Maze.constrainDirection4(effectiveDirection)) {
+    case Maze.DirectionType.NORTH:
+      square = Maze.map[Maze.pegmanY - 1] &&
+          Maze.map[Maze.pegmanY - 1][Maze.pegmanX];
       command = 'look_north';
       break;
-    case Robotmaze.DirectionType.EAST:
-      square = Robotmaze.map[Robotmaze.pegmanY][Robotmaze.pegmanX + 1];
+    case Maze.DirectionType.EAST:
+      square = Maze.map[Maze.pegmanY][Maze.pegmanX + 1];
       command = 'look_east';
       break;
-    case Robotmaze.DirectionType.SOUTH:
-      square = Robotmaze.map[Robotmaze.pegmanY + 1] &&
-          Robotmaze.map[Robotmaze.pegmanY + 1][Robotmaze.pegmanX];
+    case Maze.DirectionType.SOUTH:
+      square = Maze.map[Maze.pegmanY + 1] &&
+          Maze.map[Maze.pegmanY + 1][Maze.pegmanX];
       command = 'look_south';
       break;
-    case Robotmaze.DirectionType.WEST:
-      square = Robotmaze.map[Robotmaze.pegmanY][Robotmaze.pegmanX - 1];
+    case Maze.DirectionType.WEST:
+      square = Maze.map[Maze.pegmanY][Maze.pegmanX - 1];
       command = 'look_west';
       break;
   }
   if (id) {
-    Robotmaze.log.push([command, id]);
+    Maze.log.push([command, id]);
   }
-  return square !== Robotmaze.SquareType.WALL && square !== undefined;
+  return square !== Maze.SquareType.WALL && square !== undefined;
 };
 
 /**
  * Is the player at the finish marker?
  * @return {boolean} True if not done, false if done.
  */
-Robotmaze.notDone = function() {
-  return Robotmaze.pegmanX != Robotmaze.finish_.x || Robotmaze.pegmanY != Robotmaze.finish_.y;
+Maze.notDone = function() {
+  return Maze.pegmanX != Maze.finish_.x || Maze.pegmanY != Maze.finish_.y;
 };
 
-window.addEventListener('load', Robotmaze.init);
+window.addEventListener('load', Maze.init);

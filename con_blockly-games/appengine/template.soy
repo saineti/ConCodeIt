@@ -80,37 +80,18 @@
  */
 {template .titleSpan private="true"}
   <span id="title">
-    {if $ij.html}
+    /*{if $ij.html}
       <a href="index.html?lang={$ij.lang}">
     {else}
       <a href="./?lang={$ij.lang}">
     {/if}
       {msg meaning="Games.name" desc="IBID"}Blockly Games{/msg}
     </a>
-    {sp}:{sp}
+    {sp}:{sp}*/
     {$appName}
+    <br>
+    <font size="1">We need your help programming our robot to take an order from Table 2! Write a program such that the robot goes to Table 2, asks for the table’s order, and finally goes to the kitchen to hand off the order to the chef. You should make sure that the robot does not run into any obstacles as it moves from one place to another using its sensors. Additionally, the robot should ask the diners for their order both verbally and by displaying the question on its screen simultaneously and the diners should be able to click on either the screen or respond verbally to convey their order. Hint: Use the wait for blocks to program the robot to do concurrent actions.</font>
   </span>
-{/template}
-
-/**
- * List of links to other levels.
- * @param level Current level.
- * @param maxLevel Maximum level.
- * @param lang Language code.
- * @param suffix Any extra parameters for links.
- */
-{template .levelLinks private="true"}
-  {sp}&nbsp;{sp}
-  {for $i in range(1, $maxLevel + 1)}
-    {sp}
-    {if $i == $level}
-      <span class="level_number level_done" id="level{$i}">{$i}</span>
-    {elseif $i == $maxLevel}
-      <a class="level_number" id="level{$i}" href="?lang={$lang}&level={$i}{$suffix}">{$i}</a>
-    {else}
-      <a class="level_dot" id="level{$i}" href="?lang={$lang}&level={$i}{$suffix}"></a>
-    {/if}
-  {/for}
 {/template}
 
 /**

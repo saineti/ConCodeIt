@@ -78,6 +78,143 @@ Blockly.JavaScript['maze_moveForward'] = function(block) {
   return 'moveForward(\'block_id_' + block.id + '\');\n';
 };
 
+Blockly.Blocks['maze_goForward'] = {
+  /**
+   * Block for moving forward.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": BlocklyGames.getMsg('Maze_goForward'),
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Maze.Blocks.MOVEMENT_HUE,
+      "tooltip": BlocklyGames.getMsg('Maze_goForwardTooltip')
+    });
+  }
+};
+
+Blockly.JavaScript['maze_goForward'] = function(block) {
+  // Generate JavaScript for moving forward.
+  return 'goForward(\'block_id_' + block.id + '\');\n';
+};
+
+Blockly.Blocks['maze_waitForAnyOf'] = {
+  init: function() {
+    this.appendValueInput("CHOICES")
+        .setCheck("Array")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("wait for any action");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('Starts all given actions and waits for any one of them to finish');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['maze_waitForAnyOf'] = function(block) {
+  // Generate JavaScript for displaying a question.
+  var value_choices = Blockly.JavaScript.valueToCode(block, 'CHOICES', Blockly.JavaScript.ORDER_COMMA) || '\'\'';
+  var code = 'waitForAnyOf(' + value_choices + ');\n';
+  return code;
+};
+
+Blockly.Blocks['maze_waitForAll'] = {
+  init: function() {
+    this.appendValueInput("CHOICES")
+        .setCheck("Array")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("wait for all actions");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('Starts all given actions and waits for all of them to finish');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['maze_waitForAll'] = function(block) {
+  // Generate JavaScript for displaying a question.
+  var value_choices = Blockly.JavaScript.valueToCode(block, 'CHOICES', Blockly.JavaScript.ORDER_COMMA) || '\'\'';
+  var code = 'waitForAll(' + value_choices + ');\n';
+  return code;
+};
+
+
+Blockly.Blocks['maze_waitForSpecificOne'] = {
+  init: function() {
+    this.appendValueInput("MAIN_ACTION")
+        .setCheck("String")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("wait for ");
+    this.appendValueInput("SECONDARY_ACTIONS")
+        .setCheck("Array")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("while running");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('Starts all given actions and waits for main action to finish');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['maze_waitForSpecificOne'] = function(block) {
+  // Generate JavaScript for displaying a question.
+  var value_question = Blockly.JavaScript.valueToCode(block, 'MAIN_ACTION', Blockly.JavaScript.ORDER_COMMA) || '\'\'';
+  var value_choices = Blockly.JavaScript.valueToCode(block, 'SECONDARY_ACTIONS', Blockly.JavaScript.ORDER_COMMA) || '\'\'';
+  var code = 'waitForSpecificOne(' + value_question + ', ' + value_choices + ');\n';
+  return code;
+};
+
+
+Blockly.Blocks['maze_displayQuestion'] = {
+  init: function() {
+    this.appendValueInput("QUESTION")
+        .setCheck("String")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("display question");
+    this.appendValueInput("CHOICES")
+        .setCheck("Array")
+        .setAlign(Blockly.ALIGN_RIGHT)
+        .appendField("list of choices");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(260);
+    this.setTooltip('Asks a multiple choice question.');
+    this.setHelpUrl('');
+  }
+};
+
+Blockly.JavaScript['maze_displayQuestion'] = function(block) {
+  // Generate JavaScript for displaying a question.
+  var value_question = Blockly.JavaScript.valueToCode(block, 'QUESTION', Blockly.JavaScript.ORDER_COMMA) || '\'\'';
+  var value_choices = Blockly.JavaScript.valueToCode(block, 'CHOICES', Blockly.JavaScript.ORDER_COMMA) || '\'\'';
+  var code = 'displayQuestion(' + value_question + ', ' + value_choices + ');\n';
+  return code;
+};
+
+Blockly.Blocks['maze_detectLocation'] = {
+  init: function() {
+    this.appendDummyInput()
+	.appendField("sense ")
+        .appendField(new Blockly.FieldDropdown([["Table 1", "TABLE_1"], ["Table 2","TABLE_2"], ["Table 3", "TABLE_3"], ["Table 4","TABLE_4"], ["Kitchen", "KITCHEN"]]), "NAME")
+        .appendField(" reached");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(345);
+    this.setTooltip("Checks if chosen location has been reached");
+    this.setHelpUrl("");
+  }
+};
+
+Blockly.JavaScript['maze_detectLocation'] = function(block) {
+  var dropdown_name = Blockly.JavaScript.quote_(block.getFieldValue('LOCATION'));
+  var code = 'detectLocation(' + dropdown_name + ');\n';
+  return code;
+};
+
 Blockly.Blocks['maze_turn'] = {
   /**
    * Block for turning left or right.
@@ -92,6 +229,7 @@ Blockly.Blocks['maze_turn'] = {
     DIRECTIONS[1][0] += Maze.Blocks.RIGHT_TURN;
     this.setColour(Maze.Blocks.MOVEMENT_HUE);
     this.appendDummyInput()
+        .appendField("turn ")
         .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
@@ -104,6 +242,35 @@ Blockly.JavaScript['maze_turn'] = function(block) {
   var dir = block.getFieldValue('DIR');
   return dir + '(\'block_id_' + block.id + '\');\n';
 };
+
+Blockly.Blocks['maze_senseAndTurn'] = {
+  /**
+   * Block for turning left or right.
+   * @this Blockly.Block
+   */
+  init: function() {
+    var DIRECTIONS =
+        [[BlocklyGames.getMsg('Maze_turnLeft'), 'turnLeft'],
+         [BlocklyGames.getMsg('Maze_turnRight'), 'turnRight']];
+    // Append arrows to direction messages.
+    DIRECTIONS[0][0] += Maze.Blocks.LEFT_TURN;
+    DIRECTIONS[1][0] += Maze.Blocks.RIGHT_TURN;
+    this.setColour(Maze.Blocks.MOVEMENT_HUE);
+    this.appendDummyInput()
+        .appendField("sense obstacle and turn ")
+        .appendField(new Blockly.FieldDropdown(DIRECTIONS), 'DIR');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip(BlocklyGames.getMsg('Maze_turnTooltip'));
+  }
+};
+
+Blockly.JavaScript['maze_senseAndTurn'] = function(block) {
+  // Generate JavaScript for turning left or right.
+  var dir = block.getFieldValue('DIR');
+  return dir + '(\'block_id_' + block.id + '\');\n';
+};
+
 
 Blockly.Blocks['maze_if'] = {
   /**
