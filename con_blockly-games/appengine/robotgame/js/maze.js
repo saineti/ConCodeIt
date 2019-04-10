@@ -1,5 +1,6 @@
 /**
  * Blockly Games: Maze
+ *Wendy Xu Edits March 2019
  *
  * Copyright 2012 Google Inc.
  * https://github.com/google/blockly-games
@@ -68,10 +69,10 @@ Maze.SKINS = [
   // crashSound: List of sounds (in various formats) for player crashes.
   // crashType: Behaviour when player crashes (stop, spin, or fall).
   {
-    sprite: 'maze/pegman.png',
-    tiles: 'maze/tiles_pegman.png',
+    sprite: 'robotgame/robot.png',
+    tiles: 'robotgame/tiles_blank.png',
     marker: 'maze/marker.png',
-    background: false,
+    background: 'robotgame/bd_roboresturant.png',
     graph: false,
     look: '#000',
     winSound: ['maze/win.mp3', 'maze/win.ogg'],
@@ -131,11 +132,18 @@ Maze.map = [
 // Level 1.
  [[0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1],
+  [0, 3, 0, 0, 0, 0, 2],
+  [0, 1, 1, 1, 1, 1, 1],
+  [0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0]],
+/*  [[0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0],
   [0, 0, 2, 1, 3, 0, 0],
   [0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0]],
+  [0, 0, 0, 0, 0, 0, 0]], */
 // Level 2.
  [[0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
@@ -272,7 +280,7 @@ Maze.result = Maze.ResultType.UNSET;
 /**
  * Starting direction.
  */
-Maze.startDirection = Maze.DirectionType.EAST;
+Maze.startDirection = Maze.DirectionType.WEST;
 
 /**
  * PIDs of animation tasks currently executing.
